@@ -4,28 +4,35 @@
 $(document).ready(function(){
   var clientId = 'b49c63480edd40ee96c3bf68cfeef191';
   var tag = 'lighthouse';
+  var url = 'https://api.instagram.com/v1/tags/'+tag+'/media/recent?client_id=';
 
   // DOM manipulation
-  var slideShow = function(urls){    
+  var slideShow = function(imageUrls){    
     var imgTag = $('#main-image img');  
-    var i = 0;
+    var i = 1;
+    // show the first image immediately
+    imgTag.attr('src', imageUrls[i]);
     var interval = setInterval(function(){
-      imgTag.attr('src', urls[i]);
+      imgTag.attr('src', imageUrls[i]);
       i += 1;
-      if(i == 10) clearInterval(interval);
-    }, 2000);
+      if(i == imageUrls.length()) clearInterval(interval);
+    }, 1000);
   }
 
-  $.ajax({
-    method: "GET",
-    url: 'https://api.instagram.com/v1/tags/'+tag+'/media/recent?client_id='+clientId,
-    dataType: 'jsonp'
-  }).done(function(response){
-    // var nextUrl = response.pagination.next_url;
-    var images = response.data.map(function(obj){
-      return obj.images.standard_resolution.url;
+  var getImages = function(url){
+    $.ajax({
+      method: "GET",
+      url: url+clientId,
+      dataType: 'jsonp'
+    }).done(function(response){
+      // var nextUrl = response.pagination.next_url;
+      var images = response.data.map(function(obj){
+        return obj.images.standard_resolution.url;
+      });
+      slideShow(images);
     });
-    slideShow(images);
-  });
+  }
+
+  getImages(url);
 
 });
